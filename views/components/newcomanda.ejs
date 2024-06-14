@@ -1,0 +1,19 @@
+<div class="corpo" style="height: 100%">
+    <div class="formcad" style="height: 90%; float:left; border: 0px none ;display: block; padding: 30px;">
+        <h1>Nova Comanda</h1>
+        <input onkeyup="searchClientsInNewSelect(event, '/searchClients', 'clId')" type="text" id="nCliente" style="float:left;text-align: center; font-size: 18px ;padding: 0px; margin: 15px 0px 15px 0px; height: 40px;width: 75%;" placeholder="Pesquisar Cliente">
+        <div id="vTotal" style="float:right; padding-top: 11px; width: 25%;height: 40px; box-sizing: border-box; text-align: center; margin: 15px 0px 15px 0px;;background-color: blueviolet; color: white;">
+            Valor Total: 0,00
+        </div>
+        <select name="client" class="myselect" style="width:100%; float:left; margin: 10px 0px 10px 0px" id="clId"></select>
+        
+        <button class="btn full100" onclick="addNewItem('corpo')">adicionar item</button>
+        <div id="corpo" style="padding: 0px; border: none; background-color: rgba(0,0,0,0.1);" class="overflow" >
+           
+        </div>
+        <br>
+        <button class="btn" onclick="loadData('PAGO')">Pagar</button>
+        <button class="btn" onclick="loadData('ABERTO')">Deixar em Aberto</button>
+        <br>
+    </div>  
+</div>

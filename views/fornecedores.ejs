@@ -1,0 +1,321 @@
+<%- include('partials/header.ejs') %>
+<body>
+    <%- include('partials/navbar.ejs') %>
+    <nav class="navbar navitens">
+        <a id="1" onclick="loadPage(0)">Todos os Fornecedores</a>
+        <a id="2" onclick="loadPage(1)">Novo</a>
+        <a id="3" onclick="loadPage(2)">Consultar Preço</a>
+    </nav>
+    
+    <div class="corpo">
+        <div id="getComponents">
+        
+    </div>
+    <script src="/js/functionsFornecedores.js"></script>
+    <script>
+        var getcom = document.getElementById('getComponents');
+        var pages = 
+        [
+            `
+                <br>
+                <h1>Todos os Fornecedores</h1>
+                
+            `,
+            `   
+                <br>
+                <input id="nameFornecedor" type="text" class="myinput full40" placeholder="Nome do Fornecedor">
+                <br>
+                <br>
+                <input id="telFornecedor" type="text" class="myinput full40" placeholder="Número Telefone">
+                <br><br>
+                <input id="obsFornecedor" type="text" class="myinput full40" placeholder="Observações">
+                <br><br>
+                
+                <button class="btn2 btn" onclick="sendDataToServer()">Cadastrar</button>
+                
+            `,
+            `
+                <br>    
+                <input type="text" class="myinput full70" onkeyup="searchItenUni(event, itensFetch)">
+                <br><br>
+                <select class="myselect full70" id="itensFetch" onchange="changed()">
+                <div id="datas"></div>
+            `
+        ]
+        var novoproduto = document.createElement('button');
+                    novoproduto.setAttribute('class', 'btn btn2 full30');
+                    novoproduto.setAttribute('onclick', 'novoProduto()')
+                    novoproduto.innerHTML = 'Adicionar Produto';
+        var fecharpedido = document.createElement('button');   
+                    fecharpedido.setAttribute('class', 'btn btn2 full30');
+                    fecharpedido.setAttribute('onclick', 'salvarPedido()')
+                    fecharpedido.innerHTML = 'Realizar Pedido';
+
+        function novoPedido(fornecedorid){
+            getcom.innerHTML = '';
+            console.log(fornecedorid)
+            var data =initDataFormat({id:fornecedorid});
+            fetch('/findfornecedorbyid', data).then(r=>{
+                r.json().then(r=>{
+                    var newdiv = document.createElement('div');
+                    newdiv.innerHTML = "<h1>Novo Pedido de: " + r[0].name + "</h1>";
+                    newdiv.setAttribute('class', 'dataShow full90');
+
+                    var divfantasma = document.createElement('div');
+                    divfantasma.setAttribute('class', 'dontshow');
+                    divfantasma.setAttribute('fornecedor', r[0].id);
+                    divfantasma.setAttribute('id', 'dadosfornecedor');
+                    getcom.appendChild(divfantasma);
+                    var novoproduto = document.createElement('button');
+                    novoproduto.setAttribute('class', 'btn btn2 full30');
+                    novoproduto.setAttribute('onclick', 'novoProduto()')
+                    novoproduto.innerHTML = 'Adicionar Produto';
+                    newdiv.appendChild(novoproduto)
+                    newdiv.appendChild(fecharpedido)
+
+                    var itens = document.createElement('div');
+                    itens.setAttribute('id', 'itens');
+                    getcom.appendChild(newdiv)
+                    getcom.appendChild(itens)
+                    console.log(newdiv)
+                    //getcom.innerHTML = "<div class='dataShow'><h1>Novo Pedido de: " + r[0].name + "</h1></div>";
+                })
+            })
+            //getcom.innerHTML =  "Novo Pedido de: " ;
+        }
+        function salvarPedido(){
+            var datavalues = [...document.getElementsByName('qtds')]
+            var dataselects = [...document.getElementsByName('selects')];
+            var fornecedorid = document.getElementById('dadosfornecedor').getAttribute('fornecedor')
+            var valores = [];
+            var produtos = [];
+            for(var i=0; i<datavalues.length; i++){
+                valores[i] = datavalues[i].value;
+                produtos[i] = dataselects[i].selectedOptions[0].value;
+            }
+            console.log(valores);
+            console.log(produtos);
+
+            var data = initDataFormat({fornecedorid: fornecedorid,valores: valores, produtos: produtos});
+
+            fetch('/salvarpedido', data);
+        }
+        var itenscount = 0;
+        const fullx = 'full50'
+        function novoProduto(){
+
+            var itens = document.getElementById('itens');
+            var newwindow = document.createElement('div');
+            newwindow.setAttribute('class','dataShow full70');
+            newwindow.setAttribute('id', 'window'+itenscount);
+            var newiten = document.createElement('input');
+            
+            newiten.setAttribute('class', 'myinput '+fullx);
+            newiten.setAttribute('id', itenscount);
+            newiten.setAttribute('placeholder', 'Pesquise o Produto');
+            newiten.setAttribute('onkeyup', 'searchIten(event)')
+            newwindow.appendChild(newiten);
+            
+            var newvalue = document.createElement('input');
+            newvalue.setAttribute('class', 'full30 myinput');
+            newvalue.setAttribute('name', 'qtds');
+            newvalue.setAttribute('placeholder', 'Valor de Compra');
+            newvalue.setAttribute('type', 'number');
+            newwindow.appendChild(newvalue);
+
+            var newqtd = document.createElement('input');
+            newqtd.setAttribute('onkeyup', 'analisar(event)');
+            newqtd.setAttribute('type', 'number');
+            newqtd.setAttribute('class', 'myinput');
+            newqtd.setAttribute('placeholder', 'Quantidade');
+            newwindow.appendChild(newqtd);
+
+
+
+            var info = document.createElement('div');
+            info.setAttribute('id', 'info'+itenscount);
+            info.innerHTML = '';
+            newwindow.appendChild(info);
+
+            var select = document.createElement('select');
+            select.setAttribute('name', 'selects');
+            select.setAttribute('id', 'iten'+itenscount);
+            select.setAttribute('iditen', itenscount);
+            select.setAttribute('class', 'myselect margin10 '+fullx);
+            select.setAttribute('onchange', 'changed(event)');
+
+            newwindow.appendChild(select);
+            itens.prepend(newwindow);
+            //itens.prepend(newiten);
+
+            newiten.focus();
+            itenscount++;
+        }
+        function analisar(event){
+            console.log(event.keyCode)
+            if(event.keyCode == 188 || event.keyCode == 110){
+                //event.target.value = event.target.value.replaceAll(',','.')
+            }
+        }
+        function created(selectname){
+            var selected = document.getElementById(selectname);
+            var idproduto = selected.selectedOptions[0].value;
+            var idfornecedor = document.getElementById('dadosfornecedor').getAttribute('fornecedor');
+            console.log(idproduto)
+            var data = initDataFormat({idfornecedor: idfornecedor, idproduto: idproduto});
+            fetch('/findfornecedoriten', data).then(r=>{
+                r.json().then(r=>{
+                    console.log(r);
+                    var info = document.getElementById('info'+ selected.getAttribute('iditen'));
+                    if(r.length == 0){
+                        info.innerHTML = 'Nao comprado anteriormente nessa empresa';
+                    } 
+                    else{
+                        info.innerHTML = 'já comprado';
+                    }
+                })
+            })
+        }
+        function changed(event){
+            console.log(event.target);
+            var idproduto = event.target.selectedOptions[0].value;
+            var idfornecedor = document.getElementById('dadosfornecedor').getAttribute('fornecedor');
+            console.log(idproduto)
+            var data = initDataFormat({idfornecedor: idfornecedor, idproduto: idproduto});
+            fetch('/findfornecedoriten', data).then(r=>{
+                r.json().then(r=>{
+                    console.log(r);
+                    var info = document.getElementById('info'+ event.target.getAttribute('iditen'));
+                    if(r.length == 0){
+                        info.innerHTML = 'Nao comprado anteriormente nessa empresa';
+                    } 
+                    else{
+                        info.innerHTML = 'já comprado';
+                    }
+                })
+            })
+        }
+        function searchIten(event){
+            if(event.keyCode ==13){
+                console.log(event.target)
+                var name = event.target.value;
+                var data = initDataFormat({name:name});
+                var select = document.getElementById('iten'+ event.target.getAttribute('id'));
+                var aux = 0;
+                select.innerHTML = '';
+                fetch('/searchItens', data).then(r=>{
+                    r.json().then(r=>{
+                        r.forEach(produto=>{
+                            var newOpt = document.createElement('option');
+                            newOpt.setAttribute('value', produto.id);
+                            newOpt.innerHTML = produto.name;
+                            select.appendChild(newOpt);
+                            if(aux==0)created(select.getAttribute('id'));
+                            aux++;
+                        })
+                    })
+                })
+                //created(select.getAttribute('id'));
+                
+            }
+        }
+        function searchItenUni(event, selectId){
+            if(event.keyCode ==13){
+                console.log(event.target)
+                var name = event.target.value;
+                var data = initDataFormat({name:name});
+                var select;
+                if(typeof selectId == 'string'){
+                    select = document.getElementById(selectId);
+                }else{
+                    select = selectId;
+                }
+                select.innerHTML = '';
+                fetch('/searchItens', data).then(r=>{
+                    r.json().then(r=>{
+                        r.forEach(produto=>{
+                            var newOpt = document.createElement('option');
+                            newOpt.setAttribute('value', produto.id);
+                            newOpt.innerHTML = produto.name;
+                            select.appendChild(newOpt);
+                        })
+                    })
+                })
+            }
+        }
+        
+
+        function loadPage(index){
+            //var getcom = document.getElementById('getComponents');
+            getcom.innerHTML = pages[index];
+            if(index == 0){
+                fetch('/getallfornecedores').then(r=>{
+                    r.json().then(r=>{
+                        console.log(r)
+                        r.forEach(r=>{
+                            console.log(r)
+                            var newdiv = document.createElement('div');
+                            newdiv.setAttribute('idFornecedor', r.id)
+                            newdiv.setAttribute('onclick', 'showDiv('+r.id+')');
+                            newdiv.setAttribute('class', 'dataShow full70')
+                            newdiv.innerHTML = r.name;
+                            var info = document.createElement('div');
+                            info.setAttribute('class', 'dontshow');
+                            info.setAttribute('id', 'info'+r.id)
+                            info.innerHTML = 'Celular: '+r.phone + '<br>';
+                            var buttonadd = document.createElement('button');
+                            buttonadd.setAttribute('class', 'btn btn2');
+                            buttonadd.innerHTML = 'Novo Pedido';
+                            buttonadd.setAttribute('onclick', 'novoPedido('+r.id+')')
+                            info.appendChild(buttonadd)
+                            newdiv.appendChild(info)
+                            getcom.appendChild(newdiv);
+                        })
+                    })
+                })
+            }
+            else if(index == 2){
+                getcom.innerHTML = pages[2];
+
+            }
+        }
+        function showDiv(id){
+            
+            //console.log(event.target);
+            try {
+                console.log(id)
+                var infoid = 'info'+id;
+                var infoElement = document.getElementById(infoid);
+                var classes = [...infoElement.classList];
+                if(classes.includes('dontshow')){
+                    classes.pop('dontshow')
+                }else{
+                    classes.push('dontshow')
+                }
+                console.log([...infoElement.classList])
+                infoElement.classList = classes
+                
+            } catch (error) {
+                
+            }
+        }
+        function sendDataToServer(){
+            var name = document.getElementById('nameFornecedor').value;
+            var tel = document.getElementById('telFornecedor').value;
+            var obs = document.getElementById('obsFornecedor').value;
+            //initDataFormat({name: name, tel: tel});
+            fetch('/addfornecedor', initDataFormat({name: name, tel: tel, obs: obs})).then(r=>{
+                r.json().then(r=>{
+                    if(r.msg){
+                        loadPage(0);
+                        alert('cadastrado');
+                    }
+                })
+            });
+
+        }
+
+        
+    </script>
+</body>
+<%- include('partials/footer.ejs') %>

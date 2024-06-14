@@ -1,0 +1,41 @@
+<%- include('partials/header.ejs') %>
+<body>
+    <%- include('partials/navbar.ejs') %>
+    <div class="corpo">
+        <div id="getComponents"></div>
+    </div>
+    <script>
+        carregaElemento('../getNewComanda', 'getComponents');
+
+       
+        
+        function loadData(type){
+            var dadoSelect = [...document.getElementsByClassName('dadoSelect')];
+            var dadoQtd = [...document.getElementsByClassName('dadoQtd')];
+            
+            var clientId = document.getElementById('clId').selectedOptions[0].value;
+            var data = [];
+
+            for(var i = 0; i < dadoQtd.length; i++){
+                var dado = {
+                    quantidade: dadoQtd[i].value,
+                    produtoId: dadoSelect[i].selectedOptions[0].getAttribute('iid')
+                }
+                console.log(dado);
+                data.push(dado);
+                console.log(data)
+            }
+            const init = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({data, type, clientId})
+            }
+
+            myFetchPOST('/newComanda', init);
+        }
+    </script>
+    
+</body>
+<%- include('partials/footer.ejs') %>

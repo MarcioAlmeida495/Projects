@@ -1,0 +1,21 @@
+<%- include('../../partials/header.ejs') %>
+<body>
+    <%- include('../../partials/navbar.ejs') %>
+    <div class="corpo" >
+        <h1>Categorias</h1>
+        <br>
+        <a class="btn btn2" href="/admin/categories/new">Adicionar nova Categoria</a>
+        <br><br>
+        <% categories.forEach(category =>{ %>
+            <hr>
+            <%= category.title %>
+            <br>
+            <a href=""> <%= category.slug %> </a>
+            <hr>
+        <%})%>
+        
+    </div>
+    
+    
+</body>
+<%- include('../../partials/footer.ejs') %>

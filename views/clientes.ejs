@@ -1,0 +1,83 @@
+<%- include('partials/header.ejs') %>
+<body>
+    <%- include('partials/navbar.ejs') %>
+    <nav class="navbar navitens">
+        <a class="navclitens" id="2" onclick="getClients('/getClients', 'getComponents')" clicked="true">Clientes</a>
+        <a class="navclitens" id="3" onclick="viewNewClient(event, 'getComponents')" clicked="false">Cadastrar Novo</a>
+    </nav>
+    <div class="corpo">
+        <div id="getComponents"></div>
+        
+    </div>
+    <script>
+        function onkeypressed(event, type){
+            if(type=='string'){
+                console.log()
+            }
+        }
+        function getClients(url, component){
+            fetch(url)
+                .then(r=>{
+                    r.json()
+                        .then(r=>{
+                            
+                            document.getElementById(component).innerHTML = '';
+                            r.forEach(client => {
+                                var newDiv = document.createElement('div');
+                                newDiv.setAttribute('onclick', 'showData(event)');
+                                newDiv.setAttribute('id', 'cl' + client.id )
+                                newDiv.setAttribute('class', 'clients full90');
+                                newDiv.setAttribute('style', 'padding: 10px; height: 50px;');
+                                var newId = document.createElement('div');
+                                newId.setAttribute('style', 'width: 40px; margin: 0px 10px 0px 10px;')
+                                newId.innerHTML = client.id;
+                                newDiv.appendChild(newId)
+                                var newName = document.createElement('div');
+                                newName.setAttribute('style', 'width: 200px; text-align: left;')
+                                newName.innerHTML = client.name;
+                                newDiv.appendChild(newName)
+                                document.getElementById(component).appendChild(newDiv);
+                            })
+                        })
+                })
+        }
+        function showData(event){
+            console.log(event.target)
+        }
+        //viewNewClient('getComponents')
+        function viewNewClient(event, componentId){
+            
+            document.getElementById(componentId).innerHTML =   '<div class="corpo">'
+                       + '<div class="formcad" style="float:left; display: block; padding: 30px;">'
+                       + '<h1>Cadastro de Clientes</h1>'
+                       + '<br>'
+                       + '<input type="text" placeholder="Nome do Cliente" class="myinput data">'
+                       + '<input type="text" placeholder="Endereço" class="myinput data">'
+                       + '<input type="text" placeholder="Telefone / Celular" class="myinput data">'
+                       + '<input type="text" placeholder="CPF" class="myinput data">'
+                       + '<br><br>'
+                       + '<button class="btn" onclick="analyseData()">Cadastrar</button>'
+                       + '</div>'  
+                       + '</div>'
+        }
+
+        function analyseData(){
+            var dataorg = {nome: '', endereco: '', phone: '', CPF: ''};
+            var datas = document.getElementsByClassName('data');
+            dataorg.nome = datas[0].value;
+            dataorg.endereco = datas[1].value;
+            dataorg.phone = datas[2].value;
+            dataorg.CPF = datas[3].value;
+            console.log(dataorg);
+            var init = initDataFormat(dataorg);
+            fetch('/addCliente', init)
+                .then(r=>{
+                    r.json()
+                        .then(r=>{
+                            console.log(r);
+                        })
+                })
+        }
+    </script>
+</body>
+<%- include('partials/footer.ejs') %>

@@ -1,0 +1,837 @@
+<%- include('../partials/header.ejs') %>
+<body>
+    <%- include('../partials/navbar.ejs') %>
+    <%- include('../partials/subitens/navbarComandas.ejs')%>
+    <div class="corpo" id="corpo" style="padding: 20px; height: 85%; margin-left: 0px; margin-right: 0px;width: 100%;overflow: auto ;text-align: left;">
+        
+    </div>
+    <script>
+        const page1 = `
+        <h1 >Comandassssssssss</h1> 
+        <div id="getextern"></div>
+        <div style="border: 1px solid black; border-radius: 3px; padding: 10px;">
+            <button class="btn btn2" onclick="clear()">Limpar</button>
+            <input type="text" class="myinput" id="client-id" style="width: 300px;" placeholder="Nome do Cliente" onkeyup="dataOnCheckbox(event, 'nameFilterCheck')">
+            <select class="myselect" style="width: 300px" id="selectClientFilter"></select>
+            <input onchange="getComandas('getComponents')" type="checkbox" name="" id="nameFilterCheck" style="height: 25px; width: 25px; padding: 10px;">
+            
+            <select name="" onchange="selectchanged(event)" id="selType" class="myselect" style="width: 100px; height: 25px;">
+                <option value="ABERTO">ABERTO</option>
+                <option value="PAGO">PAGO</option>
+                <option value="TODAS">TODAS</option>
+            </select>
+            <input onchange="getComandas('getComponents')" type="date" name="" id="dateFilter" style="width: 100px; height: 25px;">
+            
+            <input onchange="getComandas('getComponents')" type="checkbox" name="" id="dateFilterCheck" style="height: 25px; width: 25px; padding: 10px;">
+            <button class="btn btn2" onclick="getComandas('getComponents')">Pesquisar</button>
+            <button class="btn btn2" onclick="showComponent('qtd13')">Show All</button>
+        </div>
+        
+        <div id="total-id-div">SAJDHSAKJDHAS</div>
+        <div id="newcommand-id" style="float:left; width: 350px; height: 80%; overflow: auto"></div>
+        <div id="getComponents" style="height: 73%; overflow: auto; float: left; margin: 20px;width: 500px;border-radius: 5px; border: 1px black solid"></div>
+          `;
+        
+        function showComponent(id){
+            
+            console.log(document.getElementById(id));
+        }  
+        
+        document.getElementById('corpo').innerHTML = page1;
+        const urlGetComandas = 'getAllComandas';
+        var classDataQtd = 'dataqtd';
+        var classDataItenSelect = 'dataiten';
+        var classDataClient = 'dataclient';
+        const URLsClients = '/searchClients'
+        const newcomid = 'newComId';
+        const newComand = 'newComandID';
+        const divItensID = 'itensComponent'
+        const selectID = 'clId';
+        var componentsLeft = [];
+        var clicks = 0;
+        function getClassData(prefixo ,comanda, id){
+            return prefixo + comanda + id;
+        }
+
+        function create(tag, attributes, content){
+            var element = document.createElement(tag)
+            attributes.forEach(attribute=>{
+                console.log(attribute.name)
+                console.log(attribute.value)
+                element.setAttribute(attribute.name, attribute.value);
+            })
+            element.innerHTML = content;
+            return element;
+        }
+
+        function create2(tag, content, datas){
+            var element = document.createElement(tag);
+            //console.log(datas)
+            datas.forEach(data=>{
+                element.setAttribute(data[0], data[1]);
+            })
+            element.innerHTML = content;
+            return element;
+        }
+
+        function clear(){
+            
+        }
+
+        function payFunction(event, divid){
+            var styleButton = 'margin:10px; text-align: center'
+            event.target.innerHTML = '';
+            event.target.setAttribute('style',' padding: 0px')
+            console.log(event.target)
+
+
+            var button = document.createElement('button');
+            button.setAttribute('style', styleButton)
+            button.setAttribute('class', 'btn btn2')
+            button.innerHTML = 'Pagar com Cartao';
+            divid.appendChild(button)
+
+            var button2 = document.createElement('button');
+            button2.setAttribute('style', styleButton)
+            button2.setAttribute('class', 'btn btn2 ')
+            button2.innerHTML = 'Pagar com Dinheiro';
+            divid.appendChild(button2)
+
+            var buttonPIX = document.createElement('button');
+            
+            buttonPIX.setAttribute('style', styleButton)
+            buttonPIX.setAttribute('class', 'btn btn2')
+            buttonPIX.innerHTML = 'Pagar com PIX';
+            divid.appendChild(buttonPIX)
+        }
+        function dataOnCheckbox(event, checkbox){
+            //console.log(checkbox)
+            var checkbox = document.getElementById(checkbox);
+            if(event.target.value.length > 0){
+                checkbox.checked = true;
+            }
+            if(event.keyCode == 13){
+                searchClientsInNewSelect(event, URLsClients, 'selectClientFilter');
+                
+                console.log(event)
+            }
+        }
+
+
+
+        
+        document.getElementById('dateFilter').value = dateToday();
+
+        function selectchanged(event){
+            var value = document.getElementById('selType').selectedOptions[0].value;
+            getComandas('getComponents')
+        }
+        function visualizarComanda(event){
+            
+        }
+        
+        function dateToday(){
+            var date = new Date();
+            
+            var mes = date.getMonth() + 1
+            var dia = date.getDate();
+            var ano = date.getFullYear();
+            if(mes<10) mes = '0'+ mes;
+            if(dia<10) dia = '0'+dia;
+            var formatedDate = ano + '-' + mes + '-' + dia;
+            return formatedDate;
+        }
+
+        function toggleClick(id){
+            var comandaComponents = [...document.getElementsByClassName('comandaComponent')];
+            
+            var has = id.classList.contains('showComandaAll');
+            
+            //comandaComponents.forEach(comanda =>{
+
+            //    comanda.classList.remove('clickedBorder')
+            //    comanda.classList.remove('showComandaAll')
+            //})
+           
+            if(!has){
+                id.classList.add('clickedBorder');
+                id.classList.add('showComandaAll')
+            }else{
+                id.classList.remove('clickedBorder');
+                id.classList.remove('showComandaAll')
+            }
+            //if(!componentsLeft.includes(id)){
+            //    document.getElementById('newcommand-id').prepend(id);
+            //    componentsLeft.push(id)
+            //}
+            
+        }
+        function getDate(){
+            var date = new Date;
+            var dia = date.getDate();
+            if(dia<10){dia= '0'+dia};
+            var ano = date.getFullYear();
+            var mes = date.getMonth()+1;
+            if(mes<10) {mes = '0'+mes};
+            
+
+            var formatdate = ano + '-' + mes + '-' +dia; 
+            return formatdate;
+        }
+        function toggleClickInputComanda(event, newcomid, id){
+            if(event.keyCode == 13){
+                newcomid.classList.remove('show')
+                newcomid.classList.add('dontshow');
+                document.getElementById(selectID).classList.remove('dontshow')
+                searchClientsInNewSelect(event, "/searchClients", selectID)
+                document.getElementById(selectID).setAttribute('style', 'width: 80%; float: right')
+            }
+        }
+        
+        function newComanda(){
+            
+            var newCom = document.createElement('div');
+                            newCom.className = 'newComanda';
+                            newCom.setAttribute('id', newComand)
+                            var buttonminimize = create2('button', '_', [['class', ''],['style', "float:right"], ['onclick', "minimizeclick("+newComand+")"]])
+                            var divinner = create2('div', 'Nova Comanda', [['style', 'width:100%; padding:5px']]);
+                            divinner.appendChild(buttonminimize);
+                            newCom.appendChild(divinner)
+                            //newCom.innerHTML = `<div style="width:100%">Nova Comanda<button style="float:right" onclick="close('newComand')" >_</button><div/>`
+                            newCom.style = 'float: left; text-align: left; font-size: 25px; height: 90%'
+                            
+                var component = newCom;            
+
+                var newIconDatas = [
+                        ['src', '/icons/lupa-25.png'],
+                        ['style', 'float:left; position: absolute'],
+                        ['onClick', 'iconClick(' + newcomid +' , '+selectID + ')']
+                    ]
+                component.appendChild(create2('img', '', newIconDatas))
+                var newClientDatas = [
+                    ['class', 'myinput'],
+                    ['placeholder', 'Pesquisa de Clientes'],
+                    ['id', newcomid],
+                    ['style', 'float: right; width: 80%; margin: 0px'],
+                    ['onKeyup', 'toggleClickInputComanda(event, ' +newcomid +' , '+selectID +')']
+                ]
+                component.appendChild(create2('input', '', newClientDatas))
+
+                var newSelectDatas =[
+                    ['class', 'myselect dontshow ' + classDataClient],
+                    ['id', selectID],
+                    ['style', 'width: 100%']
+                ]
+                component.appendChild(create2('select', '', newSelectDatas));
+                
+                var divTotal = document.createElement('div');
+                divTotal.setAttribute('id', 'totalcomandaid')
+                divTotal.setAttribute('style', 'float: left;right: 0px')
+                divTotal.setAttribute('value', 0.00)
+                component.appendChild(divTotal)
+                
+                divTotal.innerHTML = 'Total : ' + parseFloat(divTotal.getAttribute('value')).toFixed(2) ;
+
+                var newButton = document.createElement('div')
+                newButton.innerHTML = '<button class="btn btn2 full100" onclick="newIten('+divItensID+')" >Adicionar Iten</>'
+                newButton.setAttribute('id','butonsid')
+                component.appendChild(newButton)
+                var divItens = document.createElement('div')
+                divItens.setAttribute('class','full100');
+                divItens.setAttribute('id', divItensID)
+                component.appendChild(divItens);
+                clicks++
+
+            
+            return component;
+        }
+        var state = false
+        function minimizeclick(id){
+            //console.log(id)
+            state = !state;
+            var component = id;
+            if(state){
+                component.classList.add('showmin');
+            }else{
+                if(component.classList.contains('showmin'))component.classList.remove('showmin')
+            }
+        }
+        function iconClick(idshow, iddontshow){
+            idshow.classList.remove('dontshow')
+            iddontshow.classList.add('dontshow');
+
+        }
+        var getComponents = document.getElementById('corpo');
+        var windowwidth = parseInt(window.getComputedStyle(getComponents).width)
+        const valortela = 2500;
+        function buttonRed(id){
+            if(typeof id == 'string')id = document.getElementById(id)
+            id.setAttribute('style','background-color: yellow; color: black; border: solid black 1px');
+        }
+        function addItenComanda(event, id){
+            //console.log(id)
+            var aux = id.children.length;
+            var newiten = id;
+            var idcomanda = id.getAttribute('id-comanda')
+            buttonRed('edit'+idcomanda)
+            var classqtd = 'qtdclasscomanda' + idcomanda;
+            
+            document.getElementById(event.target.getAttribute('editbutton-id')).classList.remove('dontshow')
+            var divinId =  'additen' + + + aux + '_' + idcomanda
+            var classqtdcom = 'newqtdcomanda'+idcomanda;
+            var classvalorcom = 'newvalorcomanda' + idcomanda
+            var classiten = 'itenclasscomanda' + idcomanda;
+            var selectId = 'newselectcomand' + idcomanda + '_' + aux;
+            console.log(selectId)
+            var itenValueId = 'newvalor' + idcomanda + '_'  + aux;
+            var qtdId = 'newqtd' + idcomanda + '_' +aux;
+            var classes = classqtd + ' full10';
+            var classesselect  = 'newselectscomanda'+idcomanda
+            //var itenbutton = create2('button', '+', [['onclick', 'addIten("valqtd")']])
+            var itenqtd = create2('input', '', [
+                ['id', qtdId],
+                ['onchange', 'changed(event)'],
+                ['onkeyup', 'changed(event)'],
+                ['id-comanda', idcomanda],
+                ['class', 'full10 '+   classqtdcom],
+                ['name', 'qtdEditComanda'],
+                ['type', 'number'],
+                ['style', 'float: left']
+            ]);
+            var itenname = create2('input', '', 
+            [   
+                ['class', classiten],
+                ['placeholder', 'Pesquisar Iten'],
+                ['onkeyup', 'sProdute(event, '+ selectId + ', ' + qtdId + ',' + itenValueId + ')'],
+                ['name', 'nameEditComanda'],
+                ['type', 'text']
+            ]);
+            var selectiten = create2('select', '', 
+            [
+                ['id', selectId],
+                ['id-comanda', idcomanda],
+                ['class', 'myselect dontshow '+classesselect],
+                ['style', 'float: left'],
+                ['onchange', 'changed(event)']
+            ])   
+            var itenvalue = create2('input', '', 
+            [   
+                ['id', itenValueId],
+                ['readonly','true'],
+                ['class', 'full20 ' + classvalorcom]
+            ]);
+            var deleteitenbutton = create2('button', 'x', 
+            [
+                ['style', 'background-color: yellow; width: 15px; padding: 1px'],
+                ['onclick', 'deleteDiv(event)']
+            ])
+            //newiten.appendChild(itenbutton);
+            var divin = document.createElement('div');
+            divin.setAttribute('id', divinId) 
+            divin.appendChild(itenqtd)
+            divin.appendChild(itenname)
+            divin.appendChild(selectiten)
+            divin.appendChild(itenvalue)
+            divin.appendChild(deleteitenbutton)
+            newiten.appendChild(divin);
+            //newiten.innerHTML = iten.quantidade + ' ' + iten.produto.name + ' valor: ' +  iten.produto.valorV + '  Total: ' +  String(parseFloat(iten.quantidade * iten.produto.valorV).toFixed(2));
+            
+            //id.appendChild(newiten);
+
+        }
+        function deleteDiv(event){
+            event.target.parentElement.parentElement.removeChild(event.target.parentElement)
+        }
+        function getComandas(component){
+            
+            var test = new Date();
+            var type = document.getElementById('selType').selectedOptions[0].value;
+            if(type === "TODAS") type = '';
+            var date = document.getElementById('dateFilter').value;
+            if(!(document.getElementById('dateFilterCheck').checked)){
+                date = '';
+            }
+            var clientId = '';
+            try {
+                //console.log(document.getElementById('selectClientFilter'))
+                clientId = document.getElementById('selectClientFilter').selectedOptions[0].value;
+                
+            } catch (error) {
+                console.log(error)
+            } 
+                
+            if(!(document.getElementById('nameFilterCheck').checked)){
+                //console.log('AQUI????')
+                clientId = '';
+            }
+            var init = initDataFormat({type: type, date: date, clientId: clientId});
+            var component = document.getElementById(component);
+            //console.log(init)
+            try {
+                var children = [...component.children];
+                var i=0;
+                //console.log(children[children.length-1])
+                children.forEach(child=>{
+                    if(child.getAttribute('id') != newComand)
+                    component.removeChild(child)
+                })
+                
+            } catch (error) {
+                console.log('dont have children')
+            }
+
+            fetch(urlGetComandas, init)
+                .then(r=>{
+                    var aux = 0;
+                    r.json()
+                        .then(r=>{
+                            var sumTotal = 0.00;
+                            r.forEach(comanda=>{
+                                var qtditens = 0;
+                                var newDiv = document.createElement('div');
+                                newDiv.classList.add('showComanda');
+                                newDiv.classList.add('comandaComponent')
+                                var divId = 'com'+comanda.id
+                                newDiv.setAttribute('id', divId)
+                                newDiv.setAttribute('id-comanda', comanda.id)
+                                newDiv.setAttribute('onclick','toggleClick(' +divId+ ')')
+                                var valortotal = 0;
+                                newDiv.innerHTML = comanda.cliente.name + ' - ' + comanda.type + '  ' +  comanda.date;
+                                /////RELACIONADO à ALTERAÇÃO DE COMANDA
+                                var idtable = "table"+comanda.id;
+                                var itensdiv = create2('div', '', [['id', idtable],['id-comanda', comanda.id] ,['style', 'margin-top: 3px; padding: 3px; border: 1px solid black; border-radius: 3px' ]])
+                                var classqtd = 'qtdclasscomanda'+ comanda.id;
+                                var classitens = 'itensclasscomanda'+comanda.id
+                                comanda.comandaitens.forEach(iten =>{
+                                    try {
+                                        var newiten = document.createElement('div');
+                                        valortotal += parseFloat(iten.quantidade*iten.produto.valorV)
+                                        //var itenbutton = create2('button', '+', [['onclick', 'addIten("valqtd")']])
+                                        var itenqtd = create2('input', '', [['onchange', 'changed(event)'],['onkeyup', 'sumqtdtotalbyclasses('+ classqtd + ',' +  + ')'] ,['id', 'qtd' + comanda.id + '-' + qtditens], ['produtoid', iten.produto.id],['class', 'full10 qtdclasscomanda' + comanda.id],['value', iten.quantidade]]);
+                                        var itenname = create2('input', '', [['id', 'produto'+comanda.id + '-' +qtditens], ['readonly', 'true'],['valorV', iten.produto.valorV], ['produteId', iten.produto.id],['value', iten.produto.name], ['class', classitens ]])    
+                                        var itenvalue = create2('input', '', [['id','valor'+comanda.id+ '-'+ qtditens], ['value', parseFloat(iten.produto.valorV*iten.quantidade).toFixed(2)], ['readonly','true']  ,['class', 'full20 valorclasscomanda'+comanda.id]]);
+                                        //newiten.appendChild(itenbutton);
+                                        var dadosantigos = 
+                                        newiten.appendChild(itenqtd);
+                                        newiten.appendChild(itenname)
+                                        newiten.appendChild(itenvalue)
+                                        //newiten.innerHTML = iten.quantidade + ' ' + iten.produto.name + ' valor: ' +  iten.produto.valorV + '  Total: ' +  String(parseFloat(iten.quantidade * iten.produto.valorV).toFixed(2));
+                                        qtditens++;
+                                        itensdiv.appendChild(newiten);
+                                    } catch (error) {
+                                        console.log(error)
+                                    }
+                                    
+                                })
+                                newDiv.appendChild(itensdiv)
+                                sumTotal += valortotal;
+                                //CRIACAO E TRABALHO DOS DADOS DA COMANDA
+                                var newTotal = create2('div', 'TOTAL: ' + String(parseFloat(valortotal).toFixed(2)), [['id', 'tot' + comanda.id], ['style', 'padding: 5px']])
+                                
+                                
+
+                                var stylebuttons = 'margin: 5px; text-align: center';
+                                if(comanda.type == "ABERTO"){
+                                    var newButtonPay = document.createElement('div');
+                                    newButtonPay.setAttribute('class', 'btn btn2')
+                                    newButtonPay.setAttribute('style',stylebuttons)
+                                    newButtonPay.innerHTML = 'Pagar';
+                                    newButtonPay.setAttribute('onclick','payFunction(event, '+ divId +')')
+
+                                    var newButtonAddIten = document.createElement('button');
+                                    newButtonAddIten.setAttribute('class', 'btn btn2')
+                                    newButtonAddIten.setAttribute('style',stylebuttons)
+                                    newButtonAddIten.setAttribute('editbutton-id' , 'edit'+comanda.id)
+                                    newButtonAddIten.innerHTML = 'Adicionar Itens';
+                                    
+                                    newButtonAddIten.setAttribute('onclick','addItenComanda(event, '+ idtable +')')
+                                    var newButtonDoEditions = document.createElement('button');
+                                    newButtonDoEditions.setAttribute('class', 'btn btn2')
+                                    newButtonDoEditions.setAttribute('style',stylebuttons)
+                                    
+                                    newButtonDoEditions.setAttribute('id', 'edit'+ comanda.id)
+                                    newButtonDoEditions.setAttribute('onclick', 'saveEditions(event)')
+                                    newButtonDoEditions.setAttribute('class','btn btn2 dontshow')
+                                    newButtonDoEditions.innerHTML = 'Realizar Edicoes';
+                                    newDiv.appendChild(newButtonAddIten)
+                                    newDiv.appendChild(newButtonDoEditions)
+                                    newDiv.appendChild(newTotal)
+                                    newDiv.appendChild(newButtonPay);
+                                }
+                                else newDiv.appendChild(newTotal)
+                                var analyse = true;
+                                var arraycontents = [...document.getElementById('newcommand-id').children]
+                                for(var i=0; i<arraycontents.length; i++){
+                                    if(arraycontents[i].getAttribute('id') == newDiv.getAttribute('id')){analyse = false}
+                                }
+                                
+                                if(analyse)component.prepend(newDiv)
+
+                               
+                                aux++;
+                                
+                            })
+                            
+                            document.getElementById('total-id-div').innerHTML = sumTotal
+                        })
+                })
+        
+            
+        }
+
+
+        function createDiv(r, idpai){
+            console.log(r)
+            r.forEach(comanda=>{
+                                var qtditens = 0;
+            var newDiv = document.createElement('div');
+            newDiv.setAttribute('style', 'background-color: red')
+            newDiv.classList.add('showComanda');
+            newDiv.classList.add('comandaComponent')
+            var divId = 'com'+comanda.id
+            newDiv.setAttribute('id', divId)
+            newDiv.setAttribute('id-comanda', comanda.id)
+            newDiv.setAttribute('onclick','toggleClick(' +divId+ ')')
+            var valortotal = 0;
+            newDiv.innerHTML = comanda.cliente.name + ' - ' + comanda.type + '  ' +  comanda.date;
+            /////RELACIONADO à ALTERAÇÃO DE COMANDA
+            var idtable = "table"+comanda.id;
+            var itensdiv = create2('div', '', [['id', idtable],['id-comanda', comanda.id] ,['style', 'margin-top: 3px; padding: 3px; border: 1px solid black; border-radius: 3px' ]])
+            var classqtd = 'qtdclasscomanda'+ comanda.id;
+            var classitens = 'itensclasscomanda'+comanda.id
+            comanda.comandaitens.forEach(iten =>{
+                try {
+                    var newiten = document.createElement('div');
+                    valortotal += parseFloat(iten.quantidade*iten.produto.valorV)
+                    //var itenbutton = create2('button', '+', [['onclick', 'addIten("valqtd")']])
+                    var itenqtd = create2('input', '', [['onchange', 'changed(event)'],['onkeyup', 'sumqtdtotalbyclasses('+ classqtd + ',' +  + ')'] ,['id', 'qtd' + comanda.id + '-' + qtditens], ['produtoid', iten.produto.id],['class', 'full10 qtdclasscomanda' + comanda.id],['value', iten.quantidade]]);
+                    var itenname = create2('input', '', [['id', 'produto'+comanda.id + '-' +qtditens], ['readonly', 'true'],['valorV', iten.produto.valorV], ['produteId', iten.produto.id],['value', iten.produto.name], ['class', classitens ]])    
+                    var itenvalue = create2('input', '', [['id','valor'+comanda.id+ '-'+ qtditens], ['value', parseFloat(iten.produto.valorV*iten.quantidade).toFixed(2)], ['readonly','true']  ,['class', 'full20 valorclasscomanda'+comanda.id]]);
+                    //newiten.appendChild(itenbutton);
+                    var dadosantigos = 
+                    newiten.appendChild(itenqtd);
+                    newiten.appendChild(itenname)
+                    newiten.appendChild(itenvalue)
+                    //newiten.innerHTML = iten.quantidade + ' ' + iten.produto.name + ' valor: ' +  iten.produto.valorV + '  Total: ' +  String(parseFloat(iten.quantidade * iten.produto.valorV).toFixed(2));
+                    qtditens++;
+                    itensdiv.appendChild(newiten);
+                } catch (error) {
+                    console.log(error)
+                }
+                
+            })
+            newDiv.appendChild(itensdiv)
+            //sumTotal += valortotal;
+            //CRIACAO E TRABALHO DOS DADOS DA COMANDA
+            var newTotal = create2('div', 'TOTAL: ' + String(parseFloat(valortotal).toFixed(2)), [['id', 'tot' + comanda.id], ['style', 'padding: 5px']])
+            
+            
+
+            var stylebuttons = 'margin: 5px; text-align: center';
+            if(comanda.type == "ABERTO"){
+                var newButtonPay = document.createElement('div');
+                newButtonPay.setAttribute('class', 'btn btn2')
+                newButtonPay.setAttribute('style',stylebuttons)
+                newButtonPay.innerHTML = 'Pagar';
+                newButtonPay.setAttribute('onclick','payFunction(event, '+ divId +')')
+
+                var newButtonAddIten = document.createElement('button');
+                newButtonAddIten.setAttribute('class', 'btn btn2')
+                newButtonAddIten.setAttribute('style',stylebuttons)
+                newButtonAddIten.setAttribute('editbutton-id' , 'edit'+comanda.id)
+                newButtonAddIten.innerHTML = 'Adicionar Itens';
+                
+                newButtonAddIten.setAttribute('onclick','addItenComanda(event, '+ idtable +')')
+                var newButtonDoEditions = document.createElement('button');
+                newButtonDoEditions.setAttribute('class', 'btn btn2')
+                newButtonDoEditions.setAttribute('style',stylebuttons)
+                
+                newButtonDoEditions.setAttribute('id', 'edit'+ comanda.id)
+                newButtonDoEditions.setAttribute('onclick', 'saveEditions(event)')
+                newButtonDoEditions.setAttribute('class','btn btn2 dontshow')
+                newButtonDoEditions.innerHTML = 'Realizar Edicoes';
+                newDiv.appendChild(newButtonAddIten)
+                newDiv.appendChild(newButtonDoEditions)
+                newDiv.appendChild(newTotal)
+                newDiv.appendChild(newButtonPay);
+            }
+            else newDiv.appendChild(newTotal)
+           
+            
+            
+        
+            //document.getElementById('total-id-div').innerHTML = sumTotal
+            console.log(newDiv)
+            if(typeof idpai == 'string') idpai = document.getElementById(idpai);
+            idpai.prepend(newDiv);
+        })
+    }
+        const URLeditComanda = '/editComanda'
+        function saveEditions(event){
+            var idcomanda = event.target.parentElement.getAttribute('id-comanda')
+            var qtds = document.getElementsByClassName('newqtdcomanda'+idcomanda);
+            var itens = document.getElementsByClassName('newselectscomanda'+idcomanda);
+            var data = 
+            {
+                idcomanda : idcomanda,
+                datas:[]
+            }
+            for(var i=0; i<qtds.length; i++){
+                var qtditen = {quantidade: qtds[i].value, produtoId: itens[i].selectedOptions[0].value}
+                data.datas.push(qtditen)
+            }
+            var init = initDataFormat(data);
+            fetch(URLeditComanda, init).then(r=>
+                r.json()
+                    .then(r=>{
+                        if(r.msg){
+                            console.log(event.target.parentElement)
+                            //console.log(componentsLeft)
+                            //componentsLeft.pop(event.target.parentElement)
+                            event.target.parentElement.parentElement.removeChild(event.target.parentElement)
+                            //getComandas('getComponents')
+                            atualizarComanda(idcomanda)
+                        }
+                    })
+            );
+            console.log(data)
+
+            console.log(qtds)
+            console.log(itens)
+        }
+        const URLsearchById = '/getAllComandas'
+        function atualizarComanda(id){
+            var init = initDataFormat({id:id});
+            fetch(URLsearchById, init)
+                .then(r=>{
+                    r.json()
+                        .then(r=>{
+                            console.log(r)
+                            createDiv(r, 'newcommand-id')
+                        })
+                })
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        const itensURL = '/searchitens'
+        function sProdute(event, idselect, idqtd, valueOf){
+            if(event.keyCode==13){
+                if(typeof idqtd === 'string')idqtd = document.getElementById(idqtd);
+                if(typeof idselect === 'string')idselect = document.getElementById(idselect);
+                if(typeof valueOf === 'string')valueOf = document.getElementById(valueOf)
+                idqtd.setAttribute('value', 1);
+                var itensSearch = event.target.value;
+                var init = initDataFormat({name: itensSearch});
+                event.target.classList.add('dontshow')
+                idselect.classList.add('show');
+                idselect.classList.remove('dontshow')
+                fetch(itensURL, init)
+                    .then(r=>{
+                        idselect.innerHTML='';
+                        r.json()    
+                            .then(r=>{
+                                r.forEach(iten=>{
+                                    var newOption = document.createElement('option');
+                                    newOption.setAttribute('value', iten.id)
+                                    newOption.setAttribute('valorV', iten.valorV)
+                                    newOption.innerHTML = iten.name
+                                    idselect.prepend(newOption)
+                                })
+                                
+                                valueOf.innerHTML = idselect.selectedOptions[0].getAttribute('valorV');
+                                valueOf.setAttribute('value', parseFloat(idselect.selectedOptions[0].getAttribute('valorV')).toFixed(2))
+                                
+                            })
+                            
+                    })
+                
+            }
+        }
+        function valuechanged(qtdid, valorid, valortotalid){
+            sumQtdTotal(qtdid, valorid, valortotalid)
+        }
+        function changed(event){
+            console.log(event.target)
+            var total = 0;
+            var comandaqtd = document.getElementsByClassName('qtdclasscomanda' + event.target.getAttribute('id-comanda'));
+            var comandaiten = document.getElementsByClassName('itensclasscomanda'+ event.target.getAttribute('id-comanda'));
+
+            console.log(comandaiten)
+            for(var i=0; i<comandaqtd.length; i++){
+                total += comandaqtd[i].value * comandaiten[i].getAttribute('valorV');
+            }
+
+            console.log(total)
+            var newcomandaqtd = document.getElementsByClassName('newqtdcomanda' + event.target.getAttribute('id-comanda'));
+            var newcomandaiten = document.getElementsByClassName('newselectscomanda' + event.target.getAttribute('id-comanda'));
+            var newcomandavalor = document.getElementsByClassName('newvalorcomanda' + event.target.getAttribute('id-comanda'))
+            
+            for(var i=0; i<newcomandaiten.length; i++){
+                var valor = parseFloat(newcomandaiten[i].selectedOptions[0].getAttribute('valorV') * newcomandaqtd[i].value).toFixed(2)
+                newcomandavalor[i].value = valor
+                total += newcomandaiten[i].selectedOptions[0].getAttribute('valorV') * newcomandaqtd[i].value;
+            }
+                console.log(total);
+                console.log(document.getElementById('tot' + event.target.getAttribute('id-comanda')));
+            document.getElementById('tot'+event.target.getAttribute('id-comanda')).innerHTML = 'TOTAL: ' + parseFloat(total).toFixed(2);
+            //console.log(newcomandaiten)
+        }
+        
+        function sumqtdtotalbyclasses(classitens, classqtds){
+            var dataqtd = [...document.getElementsByClassName(classqtds)];
+            var dataiten = [...document.getElementsByClassName(classitens)];
+            var auxtotal = 0;
+            console.log(dataqtd.length)
+            console.log(dataiten)
+            
+            for(var i=0; i<dataqtd.length; i++){
+                console.log(dataqtd[i].value)
+                console.log(dataiten[i].selectedOptions[0])
+                auxtotal += parseFloat(dataqtd[i].value)*parseFloat(dataiten[i].selectedOptions[0].getAttribute('valorV')); 
+                
+            }
+            return auxtotal;
+        }
+        function sumQtdTotal(qtdid, selID, valortotalid){
+            var dataqtd = [...document.getElementsByClassName(classDataQtd)];
+            var dataiten = [...document.getElementsByClassName(classDataItenSelect)];
+            var auxtotal = 0;
+            console.log(dataqtd.length)
+            console.log(dataiten)
+            
+            for(var i=0; i<dataqtd.length; i++){
+                console.log(dataqtd[i].value)
+                console.log(dataiten[i].selectedOptions[0])
+                auxtotal += parseFloat(dataqtd[i].value)*parseFloat(dataiten[i].selectedOptions[0].getAttribute('valorV')); 
+                
+            }
+            document.getElementById('totalcomandaid').innerHTML = "Total: " + parseFloat(auxtotal).toFixed(2);
+            valortotalid.innerHTML = 'Un: ' + parseFloat(selID.selectedOptions[0].getAttribute('valorV')).toFixed(2) + ' -- Tot: ' + parseFloat(qtdid.value * selID.selectedOptions[0].getAttribute('valorV')).toFixed(2);
+        }
+        const URLdataComanda = '/newComanda';
+        function addComanda(type){
+
+            var dataArray = [];
+            var dataqtd = [...document.getElementsByClassName(classDataQtd)];
+            var datacli = document.getElementById(selectID);
+            var dataitens = [...document.getElementsByClassName(classDataItenSelect)]
+
+            var jsonDatas = { clientId : datacli.value, type: type, data : []};
+            
+            for(var i=0;i<dataqtd.length;i++){
+                var jsonqtdprod = { produtoId : dataitens[i].value, quantidade : dataqtd[i].value }
+                jsonDatas.data.push(jsonqtdprod);
+            }
+            var init = initDataFormat(jsonDatas);
+            
+            fetch(URLdataComanda, init).then(r=>
+                r.json()
+                    .then(r=>{
+                        console.log(r)
+                        if(r.msg){
+                            aux=0;
+                            clicks=0;
+                            document.getElementById('newcommand-id').removeChild(document.getElementById(newComand))
+                            document.getElementById('newcommand-id').appendChild(newComanda());
+                            getComandas('getComponents');
+                            
+                        }
+                    })
+            );
+        }
+        var aux = 0;
+        const tamitens = '233px'
+        function newIten(id){
+            
+            
+            var itenID = 'newIten'+aux;
+            var selID = 'newSelect'+aux;
+            var qtdID = 'newQtd'+aux;
+            var valID = 'newValV'+aux;
+            var component = id;
+            var newitentext = '<input class="myinput full100" id='+ itenID+' />'
+            if(aux==0){
+                var stylebuttons = 'margin: 10px';
+                newButtonPay = document.createElement('button');
+                newButtonPay.setAttribute('class', 'btn btn2')
+                newButtonPay.setAttribute('style',stylebuttons)
+                newButtonPay.innerHTML = 'Pagar';
+                newButtonPay.setAttribute('onclick','addComanda("PAGO")')
+
+                newButtonOpenn = document.createElement('button');
+                newButtonOpenn.setAttribute('class', 'btn btn2')
+                newButtonOpenn.innerHTML = 'Deixar Aberta';
+                newButtonOpenn.setAttribute('style',stylebuttons)
+                newButtonOpenn.setAttribute('onclick','addComanda("ABERTO")')
+
+                
+                newDivButons = document.createElement('div')
+                newDivButons.setAttribute('style', 'width: 100%; text-align')
+                newDivButons.appendChild(newButtonPay);
+                newButtonPay.setAttribute('style',stylebuttons)
+                newDivButons.appendChild(newButtonOpenn);
+                document.getElementById('butonsid').appendChild(newDivButons)
+            }
+            aux++;
+            var newValorV = document.createElement('div');
+            newValorV.setAttribute('value', 0.00);
+            newValorV.setAttribute('id', valID);
+            newValorV.setAttribute('style','font-size: 18px; width: '+tamitens+';padding: 8px;float:left')
+            component.prepend(newValorV)
+            newValorV.innerHTML = '0.00' 
+
+
+            var newQtd = document.createElement('input')
+            newQtd.setAttribute('class', 'myinput ' + classDataQtd);
+            newQtd.setAttribute('placeholder', 'Qtd')
+            newQtd.setAttribute('id', qtdID)
+            newQtd.setAttribute('type', 'number')
+            newQtd.setAttribute('style', 'float: left; width: 40px; margin: 5px 0px 0px 0px')
+            newQtd.setAttribute('onkeyup', 'sumQtdTotal('+qtdID+', ' + selID +', '+ valID +')')
+            newQtd.setAttribute('onchange', 'sumQtdTotal('+qtdID+', ' + selID +', '+ valID +')')
+            component.prepend(newQtd)
+
+
+
+            var newSelect = document.createElement('select')
+            newSelect.setAttribute('class', 'myinput full100 dontshow ' + classDataItenSelect);
+            newSelect.setAttribute('id',selID)
+            newSelect.setAttribute('onchange', 'sumQtdTotal('+qtdID+', ' + selID +', '+ valID +')')
+            newSelect.setAttribute('style', 'float: right; width:'+ tamitens +';margin: 5px 0px 0px 0px')
+            component.prepend(newSelect)
+
+
+
+            var newIten = document.createElement('input')
+            newIten.setAttribute('class', 'myinput full100');
+            newIten.setAttribute('placeholder', 'Pesquisa de Iten')
+            newIten.setAttribute('id',itenID)
+            newIten.setAttribute('style', 'float: right; width:'+ tamitens +';margin: 5px 0px 0px 0px')
+            newIten.setAttribute('onKeyup', 'sProdute(event, '+selID+', ' + qtdID+', '+ valID +' )')
+            component.prepend(newIten)
+            
+
+            var newIcon = document.createElement('img');
+            newIcon.setAttribute('src', '/icons/lupa-25.png');
+            newIcon.setAttribute('style', 'float:left; margin-top:5px; margin-left: 0px; padding-left: 3px; position: relative')
+            newIcon.setAttribute('onClick', 'iconClick(' + itenID +' , '+ selID + ')')
+            component.prepend(newIcon)
+            
+            newIten.focus();
+        }
+        document.getElementById('newcommand-id').appendChild(newComanda())
+
+
+        
+        getComandas('getComponents');
+    </script>
+    
+</body>
+<%- include('../partials/footer.ejs') %>

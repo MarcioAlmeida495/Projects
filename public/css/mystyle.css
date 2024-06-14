@@ -1,0 +1,378 @@
+
+.margin10{
+    margin: 10px;
+}
+.fullh90{
+height: 90%;
+}
+.fullh80{
+    height: 80%;
+}
+.fullh70{
+    height: 70%;
+}
+.fullh30{
+    height: 30%;
+}
+#getComponents{
+    position: relative;
+    margin: 0px;
+    width: 80%;
+    height: 95%;
+    background-color: white;
+    overflow: auto;
+}
+*{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+    text-decoration: none;
+    margin: 0px;
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+checkbox{
+    width: 10px;
+}
+.full100{
+    width: 100%;
+}
+.full90{
+    width: 90%;
+}
+html{
+    height: 100%; 
+    margin: 0px;
+    padding: 0px;
+}
+body{
+    background-color:#aaa;
+    margin: 0px;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    
+}
+.corpo{
+    padding: 0px 20px 20px 20px;
+    width: 100%;
+    height: 86%;
+    background-color: white;
+    box-sizing: border-box;
+}
+.navbar{
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    height: 90px;
+    background-color: blueviolet;
+}
+.navbar a{
+    float: left;
+    line-height: 70px;
+    align-items: center;
+    color: white;
+    text-align: center;
+    height: 70px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.navbar a:hover{
+    color: rgb(233, 200, 252);
+    transition: 0.2s;
+}
+.btn{
+    background-color: rgb(53, 26, 68);
+    
+    color: white;
+    box-sizing: border-box;
+    padding: 15px;
+    border: none;
+    border-radius: 3px;
+    font-size: medium;
+}
+.btn2{
+    padding: 5px;
+}
+.btn:hover{
+    background-color: rgb(87, 34, 117);
+    transition: 2s;
+    cursor: pointer;
+}
+
+.full70{
+    width: 70%;
+    
+}
+.full60{
+    width: 60%;
+}
+.full50{
+    width: 50%;
+}
+.full40{
+    width: 40%;
+}
+.full20{
+    width: 20%;
+}
+.full15{
+    width: 15%;
+}
+.full10{
+    width: 10%;
+}
+.myselect{
+    text-align: center;
+    height: 30px;
+
+}
+.myselect *{
+    padding: 20px;
+}
+.myselect:focus{
+
+    border: 2px rgb(255, 196, 0) solid;
+    background-color: rgb(233, 223, 202);
+}
+.myinput{
+    text-align: center;
+    
+    height: 30px;
+    margin: 0px;
+}
+.myinput:hover{
+    background-color: antiquewhite;
+    border: 2px rgb(228, 162, 21) solid;   
+}
+.myinput:focus{
+    border: 2px rgb(255, 196, 0) solid;
+    background-color: rgb(233, 223, 202);
+}
+#getFetch{
+    width: 75%;
+    height: 50%;
+    background-color: rgb(221, 221, 169);
+    margin: 20px auto auto auto;
+    scroll-behavior: initial;
+
+}
+#testefetch{
+    width: 100px;
+    height: 100px;
+    background-color: black;
+    float: left;
+    margin: 10px;
+}
+#getComponents{
+    width: 100%;
+    height: 90%;
+}
+.navitens{
+    height: 40px;
+    background-color: rgb(72, 32, 109);
+}
+.navitens a{
+    padding: 0px;
+    margin: 0px 10px 0px 10px;
+    line-height: normal;
+    cursor: pointer;
+    height: auto;
+    width: auto;
+}
+.showmin{
+    height: 40px;
+    max-height: 40px;
+}
+.formcad{
+    margin-top: 5px;
+    border: 1px grey solid;
+    padding: 5px;
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+}
+.formcad *{
+    border: 1px grey solid;
+    padding: 5px;
+    border-radius: 3px;
+    
+}
+option li{
+    padding: 20px;
+}
+.dataShow{
+    border: 1px solid rgba(162, 44, 185, 0.562);
+    padding: 15px;
+    background-color: rgba(99, 41, 96, 0.253);
+    margin: 10px;
+    user-select: none;
+}
+.dataShow:hover{
+    
+    background-color: rgba(99, 41, 96, 0.514);
+    cursor: pointer;
+}
+.dataShow, .dataShow *{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.overflow{
+    
+    box-sizing: border-box;
+    max-height: 75%;
+    overflow-y: scroll;
+}
+.catList{
+    width: 300px;
+    background-color: rgb(195, 187, 202);
+    margin: 10px auto 10px auto;
+}
+table{
+    background-color: rgb(253, 250, 251);
+}
+table, tr, thead{
+    border-radius: 2px;
+    border: rgba(0, 0, 0, 0);
+    margin: 00px auto 00px auto;
+    width: 100%;
+    
+}thead{
+    background-color: rgba(194, 96, 219, 0.205);
+}
+tr{
+    margin: 2px;
+    position: relative;
+    height: 30px;
+}
+th{
+    border-radius: 2px ;
+    border:  solid 2px rgb(55, 17, 151);
+    margin: 2px;
+}
+.newComanda{
+    position: relative;
+    box-shadow: 5px 5px 10px 2px black; 
+    float: left;
+    height: 90%; 
+    padding: 5px; 
+    text-align: left; 
+    overflow: auto ;
+    margin: 20px; 
+    width: 300px;
+    border-radius: 3px;
+}
+.showComanda{
+    position: relative;
+    box-shadow: 5px 5px 10px 2px black; 
+    float: left;
+    height: 40px; 
+    padding: 5px; 
+    text-align: left; 
+    overflow: auto ;
+    margin: 10px; 
+    width: 300px;
+    border-radius: 3px;
+}
+.clickedBorder{
+    border: groove 3px purple;
+}
+.showComanda:hover{
+    cursor: pointer;
+}
+.show{
+    display: block;
+}
+.dontshow{
+    display: none;
+}
+img{
+    padding: 3px 10px 0px 10px;
+    border-radius: 5px;
+}
+img:hover{
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.showComandaAll{
+    
+    height: auto;
+
+}
+.colorY{
+    background-color: rgb(85, 85, 62);
+    color: white;
+}
+
+.colorY:hover{
+    background-color: rgb(72, 73, 62);
+    color: rgb(255, 217, 0);
+    
+}
+.colorR{
+    background-color: rgb(88, 18, 18);
+    color: white;
+}
+.colorR:hover{
+    background-color: rgb(80, 37, 37);
+    color: rgb(255, 0, 0);
+}
+.clicked{
+    color: rgb(56, 0, 94);
+}
+.clients{
+    align-items: left;
+    background-color: #555;
+    color: white;
+    height: 40px;
+    margin: 10px auto 10px auto;
+    border: 1px rgba(50,0,50, 0.5) solid;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+.clients:hover{
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.8);
+}
+.clients *{
+    align-items: left;
+    margin: 0px;
+    float: left;
+    height: 100%;
+    line-height: 40px;
+}
+.myform{
+    border: 1px grey solid;
+    padding: 10px;
+    border-radius: 20px;
+    width: 100%;
+}
+.myform *{
+    border: 1px grey solid;
+    padding: 10px;
+    border-radius: 5px;
+}
+#newItem, #newItem *{
+    border: 1px grey solid;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+
+
+::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: blueviolet;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }

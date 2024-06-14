@@ -1,0 +1,42 @@
+<%- include('../../partials/header.ejs') %>
+<body>
+    <%- include('../../partials/navbar.ejs') %>
+    <div class="corpo">
+        <br><br>
+        <h1>Novo Artigo</h1>
+        <br>
+        <form method="POST" action="/articles/save">
+            <input class="myinput" type="text" name="title" placeholder="defina o título do Artigo">
+            <br>
+            <textarea class="full70" name="body" id="article"></textarea>
+            <br>
+            <label for="">Categoria</label>
+            <select name="category" id="categories"></select>
+            <br>
+            <button class="btn">Cadastrar</button>
+        </form>
+    </div>
+</body>
+<script>
+    fetchinSelect('/fetchCategories', 'categories');
+
+    function fetchinSelect(url, component){
+        fetch(url).then(r=>{
+            r.json().then(r=>{
+                var innerhtml = ''
+                console.log(r);
+                r.forEach(r=>{
+                    innerhtml = innerhtml + '<option value="'+ r.id +'">'+ r.title +'</option>'
+                })
+                document.getElementById(component).innerHTML = innerhtml;
+            })
+        })
+    }
+
+    tinymce.init({
+        language: 'pt_BR',
+        selector: "#article",
+        plugins: 'save autolink insertdatetime searchreplace'
+    })
+</script>
+<%- include('../../partials/footer.ejs') %>

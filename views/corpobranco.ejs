@@ -1,0 +1,416 @@
+<%- include('partials/header.ejs') %>
+<body>
+    <%- include('partials/navbar.ejs') %>
+    <nav class="navbar navitens">
+        <a id="1" class="-clicked-false-" onclick="carregaElementoWithData('../newitem','getComponents', document.getElementById('categories').innerHTML)">Novo Item</a>
+        <a id="2" class="-clicked-false-" onclick="carregaElemento('../newcat', 'getComponents')">Categorias</a>
+        <a id="3" class="-clicked-false-" onclick="searchByName('/searchItens', 'getComponents', '')">Itens</a>
+        <a id="4" class="-clicked-false-" onclick="newItens()" >Adicionar Novos Itens</a>
+        
+    </nav>
+    <div class="corpo">
+        <div id="getComponents" style="height: 80%;">
+        </div>
+        <div id="categories" style="display: none;"></div>
+    </div>
+    <script>
+        const loadPage = 'getComponents'
+        const newItenPage = `
+            <br>
+            <table class="table" id="tableNewItens">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Valor de Venda</th>
+                        <th>Valor de Compra</th>
+                        <th>Quantidade</th>
+                        <th>Categoria</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyNewItens">
+                </tbody>
+            </table>
+            `;
+        var button = document.createElement('button');
+        button.setAttribute('class', 'btn btn2')
+        button.setAttribute('style', 'width: 100%')
+        button.setAttribute('onclick', 'addNewIten()');
+
+        button.innerHTML = 'Novo Produto';
+        var itensCount = 0;
+        var pageAtual = 2;
+        var savedPage = [-1, -1, -1, -1];
+        var dadosNewItensName = [];
+        var dadosNewItensVV = [];
+        var dadosNewItensVC = [];
+        var dadosNewItensQtd = [];
+        var dadosNewItensOpt = [];
+
+        function saveDatas(){
+            dadosNewItensName = [...document.getElementsByName('produte')];
+            dadosNewItensVV = [...document.getElementsByName('vv')];
+            dadosNewItensVC = [...document.getElementsByName('vc')];
+            dadosNewItensQtd = [...document.getElementsByName('qtd')];
+            dadosNewItensOpt = [...document.getElementsByName('select')];
+            
+
+        }
+        function newItens(){
+            var getcom = document.getElementById(loadPage);
+            console.log(savedPage)
+            if(savedPage[3] == -1){
+
+                getcom.innerHTML = newItenPage;
+
+                getcom.prepend(button);
+                savedPage[3] = getcom.innerHTML;
+            }else{
+                getcom.innerHTML = savedPage[3];
+                ndadosNewItensName = [...document.getElementsByName('produte')];
+                ndadosNewItensVV = [...document.getElementsByName('vv')];
+                ndadosNewItensVC = [...document.getElementsByName('vc')];
+                ndadosNewItensQtd = [...document.getElementsByName('qtd')];
+                ndadosNewItensOpt = [...document.getElementsByName('select')];
+                for(var i=0; i<dadosNewItensName.length; i++){
+                    ndadosNewItensName[i].value = dadosNewItensName[i].value;
+                    ndadosNewItensVV[i].value = dadosNewItensVV[i].value;
+                    ndadosNewItensVC[i].value = dadosNewItensVC[i].value;
+                    ndadosNewItensQtd[i].value = dadosNewItensQtd[i].value;
+                    ndadosNewItensOpt[i].value = dadosNewItensOpt[i].selectedOptions[0].value;
+                    console.log(dadosNewItensOpt[i].selectedOptions[0])
+                    
+
+                }
+
+            }
+            pageAtual = 3;
+            
+
+        }
+        function addNewIten(){
+            itensCount++;
+            var newTr = document.createElement('tr');
+            newTr.setAttribute('id', 'tr'+itensCount)
+            var newIten = 
+                `
+                    <th><input name="produte" class="name myinput full100" type="text" placeholder="nome"></th>
+                    <th><input name="vv" class="valorV full100 myinput" type="text" placeholder="Valor Venda"></th>
+                    <th><input name="vc" class="valorC myinput full100" type="text" placeholder="Valor Compra"></th>
+                    <th><input name="qtd" class="qtd myinput full100" type="text" placeholder="Quantidade"></th>
+                    <th><select name="select" class="selectiten myselect" id=`+'sel' +itensCount +` ></th>
+                    
+                `
+            newTr.innerHTML = newIten;
+            fetchinSelect('/fetchcategories', 'sel'+itensCount);
+            document.getElementById('tbodyNewItens').prepend(newTr)
+        }
+
+        function addItenTable(event){
+            var table = document.getElementById('tableNewItens');
+            
+        }
+        var bSearcher =  '<input id="searcher" type="text"  onkeyup="searchItens(event,'+
+                            "'/searchItens', 'getComponents'"+ ')" class="myinput full100">'
+        
+        var page = 0;
+        const limit = 10;
+        var rowsCount = 0;
+        var hasNext = true;
+        function previouspage(event){
+
+        }
+        function nextpage(event){
+            if(((page+1)*limit)<rowsCount){
+                event.target.setAttribute('class', 'show')
+                page++;
+                
+                searchByNameSimple();
+            }
+            
+            if(((page+1)*limit)>rowsCount){hasNext = false}
+
+            //console.log(event.target)
+            
+        }
+
+        function searchByNameSimple(){
+            
+            searchByName('/searchItens', 'getComponents', '', page)
+        }
+        function searchByName(url, componente, name){
+            var getcom = document.getElementById('getComponents');
+            console.log(savedPage);
+            savedPage[pageAtual] = getcom.innerHTML;
+            if(pageAtual==3)saveDatas();
+            searchByNamessdsds(url, componente, name, page, limit);
+            
+        }
+        function searchByNamessdsds(url, componente, name, page, limit){
+            
+                var name = {name : name, page : page, limit: limit};
+                console.log(name)
+                var init = initDataFormat(name)
+                var componente = document.getElementById(componente);
+                var meio = ''; 
+                var inicio = '';
+                console.log(url);
+                console.log(init);
+                
+                fetch(url, init)   
+                    .then(r=>{
+                        r.json()
+                            .then(r=>{
+                                //console.log(r.count);
+                                rowsCount = r.count;
+                                var inicio = bSearcher+ '<table class="table"><thead><tr><th>id</th><th>Produto</th><th>Qtd</th><th>Categoria</th><th>Valor de Venda</th><th>Valor de Compra</th><th>Ações</th></tr></thead><tbody>';
+                                r.rows.forEach(r=>{
+                                    //console.log(r)
+                                    meio = meio + '<tr id="tr'+ r.id +'"><th class="'+r.id+' itens"  style="width:30px; height: 30px;" >'+ r.id +'</th>' +
+                                        '<th class="'+r.id+'"   style="width:200px; height: 30px;">'+ r.name +'</th>'+
+                                        '<th class="'+r.id+'"   style="width:30px; height: 30px;">' + r.quantidade + '</th>'+
+                                        '<th class="'+r.id+'" id="cat'+ r.id +'" value="'+ r.category.id +'" style="width:100px; height: 30px;">' + r.category.title +'</th>'+
+                                        '<th class="'+r.id+'"   style="width:60px; height: 30px;">'+ r.valorV.toFixed(2) +'</th>'+
+                                        '<th class="'+r.id+'"   style="width:60px; height: 30px;">'+ r.valorC.toFixed(2) +'</th>'+
+                                        '<th   style="width:100px; height: 30px;">'+ bEdit(r.id) + bDelete(r.id) +'</th>'+
+                                        '</tr>'  
+                                        
+                                })
+                                componente.innerHTML = inicio + meio + '</tbody></table>'
+                                if(hasNext){
+                                    var buttonNext = document.createElement('button');
+                                    buttonNext.innerHTML = 'NEXT';
+                                    buttonNext.setAttribute('onclick', `nextpage(event)`) 
+                                    componente.appendChild(buttonNext)
+                                    
+                                }
+                                componente.innerHTML += ''
+                                //savedPage[pageAtual] = componente.innerHTML;
+                                pageAtual = 2;
+                            })
+                            
+                    })
+        }
+        function searchItens(event, url, componente){
+            if(event.keyCode == 13){
+                searchByName(url, componente, event.target.value)
+            }
+        }
+        function getClicked(event, a){
+
+        }
+
+        var bDelete = (id)=>{
+                return '<button id="b'+ id+ '" class="btn btn2 colorR"' + 'onclick="' + "excluir('../product-delete', " + id  +")" + '"' + '>' + "Excluir</button>"
+            }
+            var bEdit = (id)=>{
+                return '<button class="btn btn2 colorY" clicked="false"' + 'onclick="' + "openEdit(event, " + id  +")" + '"' + '>' + "Editar</button>"
+            }
+        fetchinSelect('/fetchCategories', 'categories');
+        //searchincomponent('../getallitens', 'getComponents');
+        searchByName('/searchItens', 'getComponents', '')
+        function searchincomponent(url, componente){
+            var componente = document.getElementById(componente);
+            var meio = ''
+            var inicio = '';
+            
+            var bDelete = (id)=>{
+                return '<button id="b'+ id+ '" class="btn btn2 colorR"' + 'onclick="' + "excluir('../product-delete', " + id  +")" + '"' + '>' + "Excluir</button>"
+            }
+            var bEdit = (id)=>{
+                return '<button class="btn btn2 colorY" clicked="false"' + 'onclick="' + "openEdit(event, " + id  +")" + '"' + '>' + "Editar</button>"
+            }
+            
+            fetch(url).then(r => {
+                //var inicio = '<table class="table"><thead><tr><th>id</th><th>Produto</th><th>Qtd</th><th>Categoria</th><th>Valor de Venda</th><th>Valor de Compra</th><th>Ações</th></tr></thead><tbody>';
+                
+                r.json().then(r=>{
+                    inicio = bSearcher+ '<table class="table"><thead><tr><th>id</th><th>Produto</th><th>Qtd</th><th>Categoria</th><th>Valor de Venda</th><th>Valor de Compra</th><th>Ações</th></tr></thead><tbody>';
+                
+                    console.log(componente.innerHTML)
+                    
+                })
+                searchByNameSimple()
+            })
+        }
+        var editopened = [];
+        function initDataFormat(data){
+            return {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }
+        }
+        var states = []; 
+        function openEdit(event, id){
+            
+            var anttr = event.target.parentElement.parentElement;
+            console.log(anttr)
+
+            var orgTable = ['id', 'name', 'quantidade', 'categoria', 'valorV', 'valorC'];
+            if(event.target.getAttribute('clicked') == 'false'){
+                
+                event.target.setAttribute('clicked', 'true');
+                document.getElementById('b'+ id).style.display = "none";
+                event.target.innerHTML = "Confirmar"
+                //console.log(editopened);
+                //console.log(event.target)
+                var components = [...document.getElementsByClassName(id)];
+                //console.log(components)
+                var i = 0;
+                components.forEach(component =>{
+                    var newInput;
+                    if(component.classList.contains('itens')){
+                        //console.log(component.classList)
+                        newInput = document.createElement('input')
+                        newInput.value = component.innerHTML;
+                        newInput.innerHTML = component.innerHTML;
+                        newInput.setAttribute('readonly', 'readonly')
+                        
+                    }
+                    else if(component.getAttribute('id')!=='cat'+id){
+                        newInput =  document.createElement('input');
+                        newInput.value = component.innerHTML
+                    }
+                    else{
+                        newInput =  document.createElement('select');
+                        var newOpt = document.createElement('option');
+                        newOpt.innerHTML = component.innerHTML
+                        newOpt.value = component.getAttribute('value');
+                        newInput.appendChild(newOpt)
+                        fetch('/fetchcategories')
+                            .then(r=>{
+                                r.json()
+                                    .then(r=>{
+                                        r.forEach(category =>{
+                                            if(category.id!= component.getAttribute('value')){
+                                                var newOpt = document.createElement('option');
+                                                newOpt.setAttribute('value', category.id);
+                                                newOpt.innerHTML = category.title;
+                                                newInput.appendChild(newOpt);
+                                            } 
+                                        })
+                                        //console.log(r);
+                                    })
+                            })
+                    }
+                    var width = component.getAttribute('style');
+                    
+                    component.innerHTML = ''
+                    newInput.setAttribute('style', width +'; text-align: center')
+                    newInput.setAttribute('name', orgTable[i]);
+                    newInput.setAttribute('class', 'inputData'+id)
+                    component.appendChild(newInput)
+
+                    //console.log(newInput)
+                    i++;
+                })
+            }
+            else if(event.target.getAttribute('clicked') == 'true'){
+                var nudedata = [...document.getElementsByClassName('inputData' + id)];
+                var data = {
+                     id: nudedata[0].value,
+                     name: nudedata[1].value,
+                     quantidade: nudedata[2].value.replaceAll(',', '.'),
+                     categoria: nudedata[3].value,
+                     valorV: nudedata[4].value.replaceAll(',', '.'),
+                     valorC: nudedata[5].value.replaceAll(',', '.')
+                    }
+                
+                console.log('CONFIRMAR')
+                console.log(data)
+                var init = initDataFormat(data);
+                fetch('/updateIten', init)
+                    .then(r=>{
+                        r.json()
+                            .then(r=>{
+                                r.forEach(r=>{
+                                    console.log(r)
+                                    var newTr = document.createElement('th');
+                                    newTr.innerHTML = r.id;
+                                    document.getElementById('tr'+id).innerHTML = createTr(r);
+
+                                    //document.getElementById('tr'+id).appendChild(newTr)
+                                })
+                            })
+                    })
+                event.target.setAttribute('clicked', 'false'); 
+                
+                //console.log(init);
+            }
+            //console.log(event.target.getAttribute('testing'))
+            
+
+        }
+        function createTr(r){
+            return '<th class="'+r.id+' itens"  style="width:30px; height: 30px;" >'+ r.id +'</th>' +
+                            '<th class="'+r.id+'"   style="width:200px; height: 30px;">'+ r.name +'</th>'+
+                            '<th class="'+r.id+'"   style="width:30px; height: 30px;">' + r.quantidade + '</th>'+
+                            '<th class="'+r.id+'" id="cat'+ r.id +'" value="'+ r.category.id +'" style="width:100px; height: 30px;">' + r.category.title +'</th>'+
+                            '<th class="'+r.id+'"   style="width:60px; height: 30px;">'+ r.valorV.toFixed(2) +'</th>'+
+                            '<th class="'+r.id+'"   style="width:60px; height: 30px;">'+ r.valorC.toFixed(2) +'</th>'+
+                            '<th   style="width:100px; height: 30px;">'+ bEdit(r.id) + bDelete(r.id) +'</th>'
+                              
+        }
+        function excluir(url, id){
+            console.log(url)
+            console.log(id)
+            const datas = {
+                id: id
+            }
+            const init = {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datas)
+            }
+            fetch(url, init)
+                .then(r =>{
+                    r.json()
+                        .then(r => {
+                            console.log(r)
+                            searchincomponent('../getallitens', 'getComponents');
+                        })
+                })
+        }
+        function carregaElementoWithData(url, componente, dadosiniciais){
+    //console.log(dadosiniciais)
+    var getcom = document.getElementById('getComponents')
+    savedPage[pageAtual] = getcom.innerHTML;
+    if(pageAtual==3)saveDatas();
+    pageAtual = 0;
+    const select = document.getElementById(componente);
+    componente.innerHTML = '';
+    fetch(url)
+        .then(r =>{
+            r.json()
+                .then(r=>{
+                    r.innerHTML = r.innerHTML.replaceAll('<--Datas-->', dadosiniciais)
+                    //console.log(r.innerHTML);
+                    select.innerHTML =  r.innerHTML;
+                })
+        })
+}
+function carregaElemento(url, componente){
+    var getcom = document.getElementById('getComponents')
+    savedPage[pageAtual] = getcom.innerHTML;
+    if(pageAtual==3)saveDatas();
+    pageAtual = 1;
+    const select = document.getElementById(componente);
+    
+    componente.innerHTML = '';
+    fetch(url)
+        .then(r =>{
+            r.json()
+                .then(r=>{
+                    //console.log(r.innerHTML);
+                    //console.log(typeof r)
+                    select.innerHTML =  r.innerHTML;
+                })
+        })
+}
+    </script>
+</body>
+<%- include('partials/footer.ejs') %>
